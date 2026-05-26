@@ -61,9 +61,9 @@ Our architecture functions as a unified pipeline:
 *  **Performance & Scalability:**
 To ensure the system remains highly responsive under heavy traffic, we have implemented several optimization strategies:
 
- 1-Atomic Caching: We utilize `Atomic Locks` combined with `Redis` to mitigate the *Cache Stampede* phenomenon. This ensures that even under a load of 300+ concurrent requests, only a single process rebuilds the cache, while others wait or serve stale data, preventing database collapse.
- 2-Intelligent Rate Limiting: Global and route-specific `Rate Limiting` is enforced to protect system resources from abuse and ensure fair usage across all API consumers.
- 3-Asynchronous Processing: Heavy-lifting tasks, such as notification dispatching and report generation, are offloaded to background `Queues`. This decouples user-facing requests from long-running logic, significantly reducing response latency.
+   1-Atomic Caching: We utilize `Atomic Locks` combined with `Redis` to mitigate the *Cache Stampede* phenomenon. This ensures that even under a load of 300+ concurrent requests, only a single process rebuilds the cache, while others wait or serve stale data, preventing database collapse.
+    2-Intelligent Rate Limiting: Global and route-specific `Rate Limiting` is enforced to protect system resources from abuse and ensure fair usage across all API consumers.
+     3-Asynchronous Processing: Heavy-lifting tasks, such as notification dispatching and report generation, are offloaded to background `Queues`. This decouples user-facing requests from long-running logic, significantly reducing response latency.
 ---
 ## 🛠️ Administrative Commands
 
