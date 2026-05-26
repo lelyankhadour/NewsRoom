@@ -53,8 +53,13 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->when(SendWriterNotification::class)
                   ->needs(NotificationSenderInterface::class)
-                    ->give(EmailNotificationSender::class);}
+                    ->give(EmailNotificationSender::class);
+
+        $this->app->when(\App\Listeners\SendReaderNotification::class)
+              ->needs(\App\Contracts\NotificationSenderInterface::class)
+              ->give(\App\Services\Notifications\DatabaseNotificationSender::class);}
    
+                    
     public function boot(): void
 
     {

@@ -26,12 +26,12 @@ class DatabaseNotificationSender implements NotificationSenderInterface
             ]);
 
             Log::info('Database notification record created successfully for administrator.', [
-                'admin_id' => $user->id
+                'id' => $user->id
             ]);
 
         } catch (Throwable $exception) {
             Log::error('Failed to write database notification logs inside service layer.', [
-                'admin_id' => $user->id,
+                'id' => $user->id,
                 'error' => $exception->getMessage()
             ]);
             
