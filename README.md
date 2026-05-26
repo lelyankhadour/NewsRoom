@@ -67,19 +67,19 @@ To ensure the system remains highly responsive under heavy traffic, we have impl
 ---
 ## 🛠️ Administrative Commands
 
-# Archive articles older than 30 days (default)
+### Archive articles older than 30 days (default):
 
 php artisan articles:archive
 
-# Archive articles older than 60 days
+### Archive articles older than 60 days:
 php artisan articles:archive 60
 
-# Preview the operation without making changes
+### Preview the operation without making changes:
 php artisan articles:archive {days} --dry-run
 
 The system includes built-in commands for manual report generation and system maintenance:
 
-# Generate Reports: Trigger manual report generation using the integrated strategy engine:
+### Generate Reports: Trigger manual report generation using the integrated strategy engine:
       php artisan articles:report weekly_articles_report
 
       php artisan articles:report monthly_authors_activity_report
