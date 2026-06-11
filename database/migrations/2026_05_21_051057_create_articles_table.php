@@ -22,6 +22,7 @@ return new class extends Migration
             $table->timestamp("published_at")->nullable();
             $table->index("status");
             $table->index("published_at");
+            $table->softDeletes();
             $table->timestamps();
         });
     }

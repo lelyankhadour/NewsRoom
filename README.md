@@ -9,10 +9,11 @@
 1. [Project Overview](#project-overview)  
 2. [Tech Stack](#tech-stack)  
 3. [Core Features](#core-features)  
-4. [Architectural Philosophy & System Design](#Architectural-Philosophy-&-System-Design)  
+4. [Architectural Philosophy & System Design](#Architectural-Philosophy--System-Design)  
 5. [Installation](#installation)  
 6. [API Endpoints](#api-endpoints)  
-7. [API Documentation](#API-Documentation)  
+7. [Testing & Quality Assurance](#testing-quality-assurance)  
+8. [API Documentation](#API-Documentation)  
 
 
 
@@ -129,6 +130,65 @@ php artisan migrate
 | Method | Endpoint | Auth | Description |
 | :--- | :--- | :--- | :--- |
 | `PUT` | `/api/v1/profile` | Yes | Update user information |
+## 🧪 Testing & Quality Assurance
+
+This project includes a comprehensive automated test suite covering all critical parts of the system to ensure stability, correctness, and predictable behavior.
+
+---
+
+### ✅ Unit Tests
+
+- **Mailables**
+  - `ArticlePublishedMail` — verifies subject and recipient handling.
+
+- **Notifications**
+  - `NewCommentNotification` — ensures correct delivery channels based on user roles.
+
+- **Jobs**
+  - `NotifySubscribersJob` — validates job construction and notification dispatching.
+
+- **Custom Notification Strategy Pattern**
+  - Ensures that the correct notification sender (Email / Database) is resolved and executed.
+
+---
+
+### ✅ Feature Tests
+
+- **Article CRUD Permissions**
+  - Access control for Writer, Reader, and Admin roles.
+  - Ensures unauthorized users receive correct HTTP status codes.
+
+- **Article Publishing Workflow**
+  - Confirms that publishing an article dispatches the required queued jobs.
+  - Ensures no jobs are dispatched when the article is not published.
+
+- **Comment System**
+  - Readers can add comments to published articles.
+  - Authors receive notifications when new comments are added.
+
+- **Attachment Upload & Secure Storage**
+  - Validates file uploads.
+  - Ensures attachments are stored securely and linked to articles.
+
+- **API Request Logging**
+  - Confirms that all API requests are logged with method and status code.
+
+- **Soft Delete Behavior**
+  - Ensures articles are soft deleted.
+  - Soft-deleted articles do not appear in listings.
+
+- **API Response Structure**
+  - Ensures responses follow the required `data` and `meta` structure.
+
+---
+
+### Running Tests
+
+Run the full test suite using:
+
+
+php artisan test
+
 
 ## 📖 API Documentation
 The API is fully documented using **ApiDog**. You can explore all endpoints, test requests in real-time, and view sample responses through our interactive documentation platform:

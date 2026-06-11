@@ -40,17 +40,22 @@ class ArticleService
                 $this->repository->syncTags($article, $tagIds);
             }
 
-            foreach ($attachments as $file) {
-                $path = $file->store( 'public');
+
+
 
               
-$article->attachments()->create([
-    'file_path' => $path,
-    'file_name' => $file->getClientOriginalName(),
-    'file_type' => $file->getClientMimeType(), 
-    'file_size' => $file->getSize(),          
-]);
-            }
+
+foreach ($attachments as $file) {
+//                 $path = $file->store( 'public');
+    $path = $file->store('attachments', 'public');
+
+    $article->attachments()->create([
+        'file_path' => $path, // attachments/hashname.jpg
+        'file_name' => $file->getClientOriginalName(),
+        'file_type' => $file->getClientMimeType(),
+        'file_size' => $file->getSize(),
+    ]);
+}
 
             event(new ArticlePublished($article));
             
@@ -100,7 +105,7 @@ $article->attachments()->create([
     public function deleteArticle(Article $article): bool
     {
         return DB::transaction(function () use ($article) {
-            // حذف المرفقات فيزيائياً عند حذف المقال
+
             foreach ($article->attachments as $attachment) {
                 Storage::disk('public')->delete($attachment->file_path);
             }

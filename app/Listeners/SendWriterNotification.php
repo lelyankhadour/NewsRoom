@@ -31,43 +31,25 @@ class SendWriterNotification implements ShouldQueue
         $this->sender = $sender;
     }
 
-    /**
-     * Handle the published article event for writers context.
-     */
-    public function handle(ArticlePublished $event): void
-    {
-        try {
-            // Retrieve all writers to notify them about the new publication
-            $writers = User::where('role', 'writer')->get();
+//    before update this method we use it to search for all writers and send emails  but now we handle only the owner of article
+public function handle(ArticlePublished $event): void
+{
+    \Log::info('DEBUG: Handle reached for article: ' . $event->article->id);
+    
+    try {
+        // $writers = User::where('role', 'writer')->get();
+        // \Log::info('DEBUG: Writers count: ' . $writers->count());
 
-            if ($writers->isEmpty()) {
-                Log::info('No writers found to notify for this article.', [
-                    'article_id' => $event->article->id
-                ]);
-                return;
-            }
+        $writer = $event->article->user;
+        \Log::info('DEBUG: Sending to writer ID: ' . $writer->id);
+        
+        $this->sender->send($writer, "your article is published  : " . $event->article->title);
+        
+        \Log::info('DEBUG: Notification sent successfully.');
 
- /**
-                 * @var \App\Models\User  $writer
-                 */
-            foreach ($writers as $writer) {
-                // Execute contextual abstraction layers to send email alerts securely
-                $this->sender->send($writer, "New article published by team: " . $event->article->title);
-            }
-
-            Log::info('SendWriterNotification listener executed successfully.', [
-                'article_id' => $event->article->id,
-                'recipients_count' => $writers->count()
-            ]);
-
-        } catch (Throwable $exception) {
-            Log::error('Error occurred inside SendWriterNotification listener execution.', [
-                'article_id' => $event->article->id,
-                'error_message' => $exception->getMessage()
-            ]);
-
-            // Release the job securely back into background system structures
-            $this->release($this->backoff);
-        }
+    } catch (Throwable $exception) {
+        \Log::error('DEBUG ERROR: ' . $exception->getMessage());
+        throw $exception; 
     }
+}
 }

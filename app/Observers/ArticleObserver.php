@@ -26,20 +26,24 @@ public function creating(Article $article): void
     /**
      * Handle the Article "updated" event.
      */
-    public function updated(Article $article): void
-    {
 
-        if ($article->wasChanged('status') && $article->status === ArticleStatus::PUBLISHED->value) {
-            
-            ArticlePublished::dispatch($article);
 
-            Log::info('ArticleObserver detected publish status: ArticlePublished event fired.', [
-                'article_id' => $article->id,
-            ]);
-        }
+public function updated(Article $article): void
+{
+    \Log::info('Observer: Updated triggered for article ' . $article->id);
+       
+    $isPublished = ($article->status instanceof ArticleStatus) 
+        ? ($article->status === ArticleStatus::PUBLISHED) 
+        : ($article->status == ArticleStatus::PUBLISHED->value);
+
+    if ($article->wasChanged('status') && $isPublished) {
+        \Log::info('Observer: Dispatching ArticlePublished event...');
+        
+        \App\Events\ArticlePublished::dispatch($article);
+    } else {
+        \Log::info('Observer: No publication detected.');
     }
-    
-
+}
     /**
      * Handle the Article "deleted" event.
      */

@@ -17,6 +17,12 @@ class ArticlePolicy
 
        public function delete(User $user, Article $article): bool
     {
+        \Log::info('Policy Check:', [
+        'user_id' => $user->id,
+        'user_role' => $user->role,
+        'article_user_id' => $article->user_id,
+        'is_admin' => ($user->role === UserRole::ADMIN)
+    ]);
         return $user->id === $article->user_id || $user->role === UserRole::ADMIN;
     }
     public function view(User $user, Article $article): bool

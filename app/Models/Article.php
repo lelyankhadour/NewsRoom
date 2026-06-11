@@ -12,11 +12,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[Fillable(['title', 'slug', 'content', 'status', 'user_id', 'published_at'])] 
 #[Appends(['read_time'])]
 class Article extends Model
-{
+{use SoftDeletes;
     use HasFactory;
 
     protected function casts(): array

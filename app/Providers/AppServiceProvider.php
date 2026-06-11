@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Events\ArticlePublished;
+use App\Events\CommentCreated;
+use App\Listeners\SendCommentNotification;
+use Event;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -13,29 +17,35 @@ use App\Models\{Article, User};
 use App\Repositories\Eloquent\{CachingArticleRepository, CachingReportRepository, EloquentArticleRepository, EloquentReportRepository, EloquentUserRepository};
 use App\Services\Notifications\{DatabaseNotificationSender, EmailNotificationSender};
 use App\Services\Reports\{ReportService, WeeklyArticlesReport, MonthlyAuthorsActivityReport};
-use App\Listeners\{ SendAdminNotification, SendWriterNotification, SendWelcomeEmail};
+use App\Listeners\{SendAdminNotification, SendWriterNotification, SendWelcomeEmail};
 use App\Observers\ArticleObserver;
 use Log;
 
 class AppServiceProvider extends ServiceProvider
 {
-    
+
     public function register(): void
     {
         \Log::info("ServiceProvider is loading...");
         //  Repositories Pattern & Singletone
-        $this->app->singleton(ArticleRepositoryInterface::class, fn() => 
+        $this->app->singleton(
+            ArticleRepositoryInterface::class,
+            fn() =>
             new CachingArticleRepository(new EloquentArticleRepository(new Article()))
         );
-// using Decorated pattern in  cachingRepository 
-        $this->app->singleton(ReportRepositoryInterface::class, fn() => 
+        // using Decorated pattern in  cachingRepository 
+        $this->app->singleton(
+            ReportRepositoryInterface::class,
+            fn() =>
             new CachingReportRepository(new EloquentReportRepository(new Article(), new User()))
         );
 
         $this->app->bind(UserRepositoryInterface::class, EloquentUserRepository::class);
 
         //  Strategy Pattern 
-        $this->app->bind(ReportService::class, fn($app) => 
+        $this->app->bind(
+            ReportService::class,
+            fn($app) =>
             new ReportService([
                 $app->make(WeeklyArticlesReport::class),
                 $app->make(MonthlyAuthorsActivityReport::class),
@@ -44,25 +54,34 @@ class AppServiceProvider extends ServiceProvider
 
         //  Contextual Binding 
         $this->app->when(SendAdminNotification::class)
-                  ->needs(NotificationSenderInterface::class)
-                  ->give(function () {
-              Log::info("Binding Triggered: Injecting DatabaseNotificationSender");
-              return new DatabaseNotificationSender();
-          });
-                //   ->give(DatabaseNotificationSender::class);
+            ->needs(NotificationSenderInterface::class)
+            ->give(function () {
+                Log::info("Binding Triggered: Injecting DatabaseNotificationSender");
+                return new DatabaseNotificationSender();
+            });
+        //   ->give(DatabaseNotificationSender::class);
 
         $this->app->when(SendWriterNotification::class)
-                  ->needs(NotificationSenderInterface::class)
-                    ->give(EmailNotificationSender::class);
+            ->needs(NotificationSenderInterface::class)
+            ->give(EmailNotificationSender::class);
 
         $this->app->when(\App\Listeners\SendReaderNotification::class)
-              ->needs(\App\Contracts\NotificationSenderInterface::class)
-              ->give(\App\Services\Notifications\DatabaseNotificationSender::class);}
-   
-                    
-    public function boot(): void
+            ->needs(\App\Contracts\NotificationSenderInterface::class)
+            ->give(\App\Services\Notifications\DatabaseNotificationSender::class);
+        $this->app->bind(
+            \App\Contracts\NotificationSenderInterface::class,
+            \App\Services\Notifications\DatabaseNotificationSender::class
+        );
+    }
 
+
+    public function boot(): void
     {
+        Event::listen(
+            CommentCreated::class,
+            SendCommentNotification::class,
+        );
+
         // Observers & Rate Limiting
         Article::observe(ArticleObserver::class);
 

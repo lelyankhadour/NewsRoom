@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\CommentController;
 use App\Http\Controllers\Api\V1\DashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\ArticleController;
@@ -18,6 +19,9 @@ Route::middleware(['api.logger', 'throttle:api'])->prefix('v1')->group(function 
         Route::prefix('profile')->group(function () {
             Route::put('/', [ProfileController::class, 'update']);
         });
+
+ // |-------------------------------Comment Routes-------------------------------------------
+ Route::post('articles/{article}/comments', [CommentController::class, 'store']);
  // |-------------------------------Article Routes-------------------------------------------
 
         Route::get('articles', [ArticleController::class, 'index']);

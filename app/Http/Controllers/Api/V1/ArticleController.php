@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreArticleRequest;
 use App\Http\Requests\UpdateArticleRequest;
 use App\Http\Resources\Api\V1\ArticleV1Resource;
-// use App\Jobs\SendArticleNotificationJob;
+
 use App\Models\Article;
 use App\Services\ArticleService;
 use App\Traits\ApiResponse;
@@ -86,16 +86,22 @@ public function update(UpdateArticleRequest $request, Article $article): JsonRes
             return $this->errorResponse("Entity state tracking mismatch triggered a failure.", 500);
         }
 }
-    /**
-     * Route API Endpoint for permanent article records removal.
-     */
-    public function destroy(Article $article): JsonResponse
-    { $this->authorize('delete', $article);
-        try {
-            $this->service->deleteArticle($article);
-            return $this->successResponse(null, "Article permanently purged from active registries.", 200);
-        } catch (\Throwable $exception) {
-            return $this->errorResponse("Database isolation lock blocked termination procedure.", 500);
-        }
+   
+public function destroy($id): JsonResponse
+{
+
+    $article = Article::find($id);
+
+    if (!$article) {
+        return response()->json(['message' => 'Article not found'], 404);
     }
+
+
+    $this->authorize('delete', $article);
+
+  
+    $this->service->deleteArticle($article);
+
+    return response()->json(['message' => 'Article deleted successfully'], 200);
+}
 }

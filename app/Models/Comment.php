@@ -8,7 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
-#[Fillable(['content', 'commentable_id', 'commentable_type'])]
+#[Fillable(['content', 'commentable_id', 'commentable_type' 
+,'user_id'
+])]
 class Comment extends Model
 {
     use HasFactory;

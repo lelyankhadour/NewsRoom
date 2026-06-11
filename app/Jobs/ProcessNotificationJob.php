@@ -26,7 +26,8 @@ public int $tries = 3;
     public function handle()
     {
        
-        $sender = new $this->senderClass();
+        // $sender = new $this->senderClass();
+        $sender = app($this->senderClass);
         $sender->send($this->user, $this->message);
     }
     /**
